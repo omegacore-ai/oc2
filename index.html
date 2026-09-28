@@ -61,7 +61,6 @@
     width:100%;
     max-width:480px;
     min-height:100vh;
-    padding-top:34px;
     display:flex;
     flex-direction:column;
     position:relative;
@@ -74,7 +73,7 @@
       width: 100%;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 34px 24px 24px;
+      padding: 0 24px 24px;
       display: flex;
       flex-direction: column;
     }
@@ -219,17 +218,6 @@
     font-family:'Consolas','JetBrains Mono',monospace; font-weight:700;
     display:flex; align-items:center; gap:6px;
   }
-  .top-logo{
-    position:absolute; left:50%; top:24px;
-    transform:translateX(-50%);
-    width:80px; height:80px; border-radius:50%;
-    object-fit:cover; object-position:center;
-    background:var(--panel);
-    border:2px solid var(--core);
-    box-shadow:0 0 22px rgba(76,201,240,.30), 0 0 0 4px rgba(76,201,240,.08);
-    pointer-events:none; z-index:2;
-  }
-
   .core-badge .spark{ animation: sparkle 1.6s ease-in-out infinite; }
   @keyframes sparkle{ 0%,100%{ opacity:.4; } 50%{ opacity:1; } }
 
@@ -745,6 +733,17 @@ body.light .aurora{ mix-blend-mode:multiply; opacity:.18; }
   position:relative; z-index:2; font-family:'Orbitron',sans-serif;
   font-size:20px; font-weight:700; color:var(--core);
   text-shadow:0 0 14px rgba(0,240,255,.65);
+}
+.brand-mark .brand-logo{
+  position:relative; z-index:2;
+  display:block; width:46px; height:46px;
+  border-radius:50%; object-fit:cover; object-position:center;
+  border:1px solid var(--line);
+  box-shadow:0 0 18px rgba(76,201,240,.25);
+}
+.app[data-state="speaking"] .brand-mark .brand-logo{
+  animation:hexSpin 3.4s linear infinite;
+  box-shadow:0 0 26px rgba(0,240,255,.55), 0 0 0 2px rgba(0,240,255,.18);
 }
 @keyframes hexSpin{ to{ transform:rotate(360deg); } }
 @keyframes edgeFlow{ to{ background-position:200% 50%; } }
@@ -1544,7 +1543,6 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
   .ring.r3{ display: none !important; }
   .scanline.s2{ display: none !important; }
   .edge-veil{ width: 48px; opacity: 0.35; }
-  .top-logo{ width:68px; height:68px; top:22px; }
 }
 
 
@@ -1992,16 +1990,13 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
     <header>
       <div class="brand">
         <div class="brand-mark">
-          <div class="hex-edge"></div>
-          <div class="hex"></div>
-          <span class="omega-sym">&#937;</span>
+          <img class="brand-logo" src="omega-logo.png" alt="Omega Core 2.0 logo" width="46" height="46">
         </div>
         <div class="brand-text">
           <h1>OMEGA 2.0</h1>
           <div class="sub">NEURAL CORE · PERSONAL AI</div>
         </div>
       </div>
-      <img class="top-logo" src="omega-logo.png" alt="Omega Core 2.0 logo" width="80" height="80">
       <div class="header-btns">
         <div class="icon-btn" id="themeBtn">&#9788;</div>
         <div class="icon-btn" id="settingsBtn">&#9881;</div>
