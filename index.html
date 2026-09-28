@@ -218,6 +218,15 @@
     font-family:'Consolas','JetBrains Mono',monospace; font-weight:700;
     display:flex; align-items:center; gap:6px;
   }
+  .top-logo{
+    display:block; width:118px; height:118px;
+    margin:16px auto 2px; border-radius:50%;
+    object-fit:cover; object-position:center;
+    background:var(--panel);
+    border:2px solid var(--core);
+    box-shadow:0 0 26px rgba(76,201,240,.30), 0 0 0 5px rgba(76,201,240,.08);
+  }
+
   .core-badge .spark{ animation: sparkle 1.6s ease-in-out infinite; }
   @keyframes sparkle{ 0%,100%{ opacity:.4; } 50%{ opacity:1; } }
 
@@ -1532,6 +1541,7 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
   .ring.r3{ display: none !important; }
   .scanline.s2{ display: none !important; }
   .edge-veil{ width: 48px; opacity: 0.35; }
+  .top-logo{ width:96px; height:96px; margin-top:12px; }
 }
 
 
@@ -1994,6 +2004,7 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
       </div>
     </header>
 
+    <img class="top-logo" src="omega-logo.png" alt="Omega Core 2.0 logo" width="118" height="118">
     <div class="core-badge">OMEGA 2.0</div>
     <div class="project-banner">UEM Science Exhibition (Nirmana) · Created by <b>Sameer Saini, Manav</b></div>
 
