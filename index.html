@@ -61,6 +61,7 @@
     width:100%;
     max-width:480px;
     min-height:100vh;
+    padding-top:34px;
     display:flex;
     flex-direction:column;
     position:relative;
@@ -73,7 +74,7 @@
       width: 100%;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 0 24px 24px;
+      padding: 34px 24px 24px;
       display: flex;
       flex-direction: column;
     }
@@ -219,12 +220,14 @@
     display:flex; align-items:center; gap:6px;
   }
   .top-logo{
-    display:block; width:88px; height:88px;
-    margin:14px auto 0; border-radius:50%;
+    position:absolute; left:50%; top:24px;
+    transform:translateX(-50%);
+    width:80px; height:80px; border-radius:50%;
     object-fit:cover; object-position:center;
     background:var(--panel);
     border:2px solid var(--core);
     box-shadow:0 0 22px rgba(76,201,240,.30), 0 0 0 4px rgba(76,201,240,.08);
+    pointer-events:none; z-index:2;
   }
 
   .core-badge .spark{ animation: sparkle 1.6s ease-in-out infinite; }
@@ -1541,7 +1544,7 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
   .ring.r3{ display: none !important; }
   .scanline.s2{ display: none !important; }
   .edge-veil{ width: 48px; opacity: 0.35; }
-  .top-logo{ width:76px; height:76px; margin-top:10px; }
+  .top-logo{ width:68px; height:68px; top:22px; }
 }
 
 
@@ -1986,8 +1989,6 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
 
   <div class="app" data-state="idle" id="app">
 
-    <img class="top-logo" src="omega-logo.png" alt="Omega Core 2.0 logo" width="88" height="88">
-
     <header>
       <div class="brand">
         <div class="brand-mark">
@@ -2000,6 +2001,7 @@ footer b{ text-shadow:0 0 8px rgba(0,240,255,.5); }
           <div class="sub">NEURAL CORE · PERSONAL AI</div>
         </div>
       </div>
+      <img class="top-logo" src="omega-logo.png" alt="Omega Core 2.0 logo" width="80" height="80">
       <div class="header-btns">
         <div class="icon-btn" id="themeBtn">&#9788;</div>
         <div class="icon-btn" id="settingsBtn">&#9881;</div>
