@@ -2441,6 +2441,7 @@ body.light .modal, body.light .side-sheet, body.light .listen-card{ background:l
     files.classList.add('gone');
     choose.classList.remove('gone');
     document.body.classList.add('gate-locked');
+    vaultHide();
   }
 
   function openAi() {
@@ -2449,6 +2450,7 @@ body.light .modal, body.light .side-sheet, body.light .listen-card{ background:l
     document.body.classList.remove('gate-locked');
     writeView('ai');
     window.scrollTo(0, 0);
+    vaultShow();
   }
 
   function openFiles() {
@@ -2458,6 +2460,7 @@ body.light .modal, body.light .side-sheet, body.light .listen-card{ background:l
     document.body.classList.add('gate-locked');
     writeView('files');
     files.scrollTop = 0;
+    vaultHide();
   }
 
   goAi.addEventListener('click', openAi);
@@ -2465,7 +2468,37 @@ body.light .modal, body.light .side-sheet, body.light .listen-card{ background:l
   back.addEventListener('click', openAi);
 
   var vaultBtn = null;
-  function revealVaultBtn() { if (vaultBtn) vaultBtn.hidden = false; }
+  var idleTimer = null;
+  var IDLE_MS = 3000;
+
+  function vaultStop() {
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+  }
+  function vaultArm() {
+    vaultStop();
+    if (!vaultBtn || vaultBtn.hidden) return;
+    idleTimer = setTimeout(function () {
+      if (vaultBtn) vaultBtn.classList.add('idle');
+    }, IDLE_MS);
+  }
+  function vaultShow() {
+    if (!vaultBtn) return;
+    vaultBtn.hidden = false;
+    vaultBtn.classList.remove('idle');
+    vaultArm();
+  }
+  function vaultHide() {
+    vaultStop();
+    if (vaultBtn) vaultBtn.classList.add('idle');
+  }
+
+  function activity() {
+    if (!vaultBtn || vaultBtn.hidden) return;
+    if (document.body.classList.contains('gate-locked')) return;
+    if (!files.classList.contains('gone')) return;
+    if (vaultBtn.classList.contains('idle')) vaultShow();
+    else vaultArm();
+  }
 
   function wireVaultBtn() {
     vaultBtn = document.getElementById('pwaVault');
@@ -2474,16 +2507,29 @@ body.light .modal, body.light .side-sheet, body.light .listen-card{ background:l
       if (!files.classList.contains('gone')) openAi();
       else openFiles();
     });
-    if (!document.body.classList.contains('gate-locked')) revealVaultBtn();
+
+    window.addEventListener('touchstart', activity, { passive: true });
+    window.addEventListener('pointerdown', activity, { passive: true });
+    window.addEventListener('keydown', activity);
+    window.addEventListener('scroll', activity, { passive: true });
+    var lastMove = 0;
+    window.addEventListener('mousemove', function () {
+      var now = Date.now();
+      if (now - lastMove < 500) return;
+      lastMove = now;
+      activity();
+    }, { passive: true });
+
+    if (!document.body.classList.contains('gate-locked')) vaultShow();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireVaultBtn);
   else wireVaultBtn();
 
   window.OmegaVault = {
-    showChooser: function () { showChooser(); revealVaultBtn(); },
-    openAi: function () { openAi(); revealVaultBtn(); },
-    openFiles: function () { openFiles(); revealVaultBtn(); },
+    showChooser: showChooser,
+    openAi: openAi,
+    openFiles: openFiles,
     count: FILES.length
   };
   window.dispatchEvent(new CustomEvent('omega:vault-ready'));
@@ -2522,8 +2568,25 @@ html.pwa .hud-strip{ top: env(safe-area-inset-top); }
 #pwaTip .x{ margin-top:14px; width:100%; padding:12px; border:0; border-radius:10px; cursor:pointer;
   background:linear-gradient(180deg,#7fe3ff,#4cc9f0); color:#03121a;
   font:700 12px/1 'Segoe UI',system-ui,sans-serif; letter-spacing:1.8px; text-transform:uppercase; }
+#pwaVault{
+  position:fixed; right:12px; bottom:calc(66px + env(safe-area-inset-bottom)); z-index:2147483000;
+  display:inline-flex; align-items:center; gap:7px; padding:10px 14px; border-radius:999px; cursor:pointer;
+  background:linear-gradient(180deg,rgba(18,26,43,.94),rgba(10,16,30,.97));
+  border:1px solid rgba(76,201,240,.34); color:#e8edf5;
+  font:600 11.5px/1 'Manrope','Segoe UI',system-ui,-apple-system,sans-serif;
+  letter-spacing:1.3px; text-transform:uppercase;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  -webkit-tap-highlight-color:transparent;
+  transition:opacity .3s ease, transform .3s ease;
+}
+#pwaVault .k{ color:#4cc9f0; font-size:13px; }
+#pwaVault:active{ transform:translateY(1px); }
+#pwaVault.idle{ opacity:0; transform:translateY(12px) scale(.94); pointer-events:none; }
+#pwaVault[hidden]{ display:none !important; }
 @media (max-width:520px){
   #pwaBar{ left:12px; right:12px; justify-content:center; }
+  #pwaVault{ right:12px; }
 }
 </style>
 
@@ -2532,66 +2595,30 @@ html.pwa .hud-strip{ top: env(safe-area-inset-top); }
   <button class="x" id="pwaTipClose" type="button">Got it</button>
 </div>
 
+<button id="pwaVault" type="button" hidden><span class="k">&#128193;</span><span>Files</span></button>
+
 <div id="pwaBar">
-  <button id="pwaVault" type="button" hidden><span class="k">&#128193;</span><span>Files</span></button>
-  <button id="pwaInstall" type="button" hidden><span class="k">⬇</span><span>Install app</span></button>
   <button id="pwaFs" type="button" title="Toggle fullscreen"><span class="k">⛶</span><span>Fullscreen</span></button>
 </div>
 
 <script>
 (function () {
   var bar = document.getElementById('pwaBar');
-  var installBtn = document.getElementById('pwaInstall');
   var fsBtn = document.getElementById('pwaFs');
   var tip = document.getElementById('pwaTip');
   var tipBody = document.getElementById('pwaTipBody');
-  if (!bar || !installBtn || !fsBtn || !tip || !tipBody) return;
+  if (!bar || !fsBtn || !tip || !tipBody) return;
 
-  var deferred = null;
   var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
                    (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) ||
                    navigator.standalone === true;
 
   if (standalone) document.documentElement.classList.add('pwa');
 
-  function isIOS() {
-    var ua = navigator.userAgent || '';
-    return /iPad|iPhone|iPod/.test(ua) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
-
   function showTip(html) { tipBody.innerHTML = html; tip.classList.add('show'); }
   function hideTip() { tip.classList.remove('show'); }
 
   document.getElementById('pwaTipClose').addEventListener('click', hideTip);
-
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    deferred = e;
-    if (!standalone) installBtn.hidden = false;
-  });
-
-  window.addEventListener('appinstalled', function () {
-    deferred = null;
-    installBtn.hidden = true;
-    hideTip();
-  });
-
-  installBtn.addEventListener('click', function () {
-    if (deferred) {
-      deferred.prompt();
-      deferred.userChoice.then(function () { deferred = null; installBtn.hidden = true; });
-      return;
-    }
-    if (isIOS()) {
-      showTip('Add <b>OMEGA</b> to your home screen for a full-screen app with no browser bar:' +
-        '<ol><li>Tap the <b>Share</b> button in Safari</li>' +
-        '<li>Choose <b>Add to Home Screen</b></li>' +
-        '<li>Open <b>OMEGA</b> from your home screen</li></ol>');
-    } else {
-      showTip('Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b> to run OMEGA full-screen with no address bar.');
-    }
-  });
 
   function isFs() {
     return document.fullscreenElement || document.webkitFullscreenElement ||
@@ -2610,22 +2637,16 @@ html.pwa .hud-strip{ top: env(safe-area-inset-top); }
     if (req) {
       var p = req.call(el);
       if (p && p.catch) p.catch(function () {
-        showTip('Your browser blocked fullscreen. On a phone, use <b>Install app</b> instead — that removes the browser bar completely.');
+        showTip('Your browser blocked fullscreen. Tap again, or use your browser fullscreen option.');
       });
     } else {
-      showTip('This browser does not support fullscreen. Use <b>Install app</b> to remove the browser bar.');
+      showTip('This browser does not support fullscreen. Try Chrome or Edge on desktop.');
     }
   });
 
   document.addEventListener('fullscreenchange', function () {
     fsBtn.querySelector('span:last-child').textContent = isFs() ? 'Exit full' : 'Fullscreen';
   });
-
-  if (standalone) {
-    installBtn.hidden = true;
-  } else if (isIOS()) {
-    installBtn.hidden = false;
-  }
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', function () {
